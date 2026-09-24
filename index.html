@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f7f9fc">
+  <meta name="theme-color" content="#111b37">
   <meta name="color-scheme" content="light dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -13,7 +13,7 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=2.0.1">
+  <link rel="stylesheet" href="./styles.css?v=3.0.0">
 </head>
 <body>
   <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -33,13 +33,26 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.3 4.3L19.5 6.8"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
     <symbol id="i-install" viewBox="0 0 24 24"><path d="M12 3v11m-4-4 4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></symbol>
+
+    <symbol id="s-math" viewBox="0 0 24 24"><path d="M4 7h7M7.5 3.5v7M15 5l5 5m0-5-5 5M4 17h7m4-2 5 5m0-5-5 5"/></symbol>
+    <symbol id="s-language" viewBox="0 0 24 24"><path d="M4 5.5c3-1.5 5.5-1.5 8 .2 2.5-1.7 5-1.7 8-.2v13c-3-1.5-5.5-1.5-8 .2-2.5-1.7-5-1.7-8-.2zM12 6v13"/></symbol>
+    <symbol id="s-english" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.7 12h16.6M12 3.5c2.5 2.5 3.5 5.3 3.5 8.5s-1 6-3.5 8.5C9.5 18 8.5 15.2 8.5 12s1-6 3.5-8.5z"/></symbol>
+    <symbol id="s-people" viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.5"/><circle cx="17" cy="9" r="2"/><path d="M3.5 19v-2a4.5 4.5 0 0 1 9 0v2zm11 0v-1.6a3.6 3.6 0 0 1 6 0V19"/></symbol>
+    <symbol id="s-screen" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4m-5-12 2 2-2 2m5 0h4"/></symbol>
+    <symbol id="s-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3M3 12c5 3 13 3 18 0m-10 1.5h2"/></symbol>
+    <symbol id="s-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></symbol>
+    <symbol id="s-network" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 7.2l3.8 8.9M17 7.2l-3.8 8.9M7 6h10"/></symbol>
+    <symbol id="s-shapes" viewBox="0 0 24 24"><circle cx="7" cy="7" r="3"/><rect x="12" y="4" width="7" height="7" rx="1"/><path d="m7 14 4 7H3zm9 1-3 6h6z"/></symbol>
+    <symbol id="s-spark" viewBox="0 0 24 24"><path d="m12 2 1.8 7.2L21 11l-7.2 1.8L12 20l-1.8-7.2L3 11l7.2-1.8z"/></symbol>
+    <symbol id="s-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M7.5 3v4M16.5 3v4M4 10h16m-11 5 2 2 4-4"/></symbol>
+    <symbol id="s-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></symbol>
   </svg>
 
   <div class="app-shell">
     <header class="app-bar">
       <div class="brand-lockup" aria-label="Stundenplan F13">
-        <span class="brand-icon"><svg class="icon"><use href="#i-calendar"/></svg></span>
-        <span class="brand-copy"><span class="brand-overline">F13</span><span class="brand-name">Stundenplan</span></span>
+        <span class="brand-icon"><img src="./brand-mark.svg" alt="" width="40" height="40"></span>
+        <span class="brand-copy"><span class="brand-overline">PTS · FMS 20 WIEN</span><span class="brand-name">F13 Stundenplan</span></span>
       </div>
       <div class="app-bar-actions">
         <button class="icon-button" id="quickToday" type="button" aria-label="Zur heutigen Woche" title="Heute"><svg class="icon"><use href="#i-home"/></svg></button>
@@ -55,7 +68,7 @@
             <h1 id="todayHeading">Guten Morgen</h1>
             <p class="greeting-subtitle" id="greetingSubtitle">Dein Überblick für heute.</p>
           </div>
-          <div class="greeting-art" aria-hidden="true"><span class="art-orbit orbit-one"></span><span class="art-orbit orbit-two"></span><span class="art-calendar"><svg class="icon"><use href="#i-calendar"/></svg></span></div>
+          <div class="greeting-art" aria-hidden="true"><span class="art-orbit orbit-one"></span><span class="art-orbit orbit-two"></span><span class="art-calendar"><img src="./brand-mark.svg" alt="" width="82" height="82"></span></div>
         </div>
         <div class="section-heading"><div><p class="eyebrow">Als Nächstes</p><h2>Nächste Stunde</h2></div><button class="text-button" data-go="schedule">Stundenplan <svg class="icon"><use href="#i-chevron-right"/></svg></button></div>
         <div id="nextLesson" class="next-lesson"></div>
@@ -64,7 +77,7 @@
       </section>
 
       <section class="view" id="view-schedule" aria-labelledby="scheduleHeading" hidden>
-        <div class="screen-heading"><div><p class="eyebrow">F13 · Schuljahr 2026/27</p><h1 id="scheduleHeading">Stundenplan</h1></div><button class="date-button" id="pickDate" type="button"><svg class="icon"><use href="#i-calendar"/></svg><span>Datum</span></button></div>
+        <div class="screen-heading"><div><p class="eyebrow">PTS · FMS 20 WIEN / F13</p><h1 id="scheduleHeading">Stundenplan</h1></div><button class="date-button" id="pickDate" type="button"><svg class="icon"><use href="#i-calendar"/></svg><span>Datum</span></button></div>
         <div class="schedule-sticky">
           <div class="week-switcher">
             <button class="round-button" id="prevWeek" type="button" aria-label="Vorherige Woche"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
@@ -84,9 +97,9 @@
           <div class="month-toolbar"><button class="round-button" id="prevMonth" type="button" aria-label="Vorheriger Monat"><svg class="icon"><use href="#i-chevron-left"/></svg></button><h2 id="monthTitle"></h2><button class="round-button" id="nextMonth" type="button" aria-label="Nächster Monat"><svg class="icon"><use href="#i-chevron-right"/></svg></button></div>
           <div class="calendar-weekdays" aria-hidden="true"><span>MO</span><span>DI</span><span>MI</span><span>DO</span><span>FR</span><span>SA</span><span>SO</span></div>
           <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Monatskalender"></div>
-          <div class="calendar-legend"><span class="legend-dot"></span>Tage mit Unterricht</div>
+          <div class="calendar-legend"><span><i class="legend-dot"></i>Unterricht</span><span><i class="legend-dot legend-bpt"></i>BPT</span><span><i class="legend-dot legend-holiday"></i>Schulfrei</span></div>
         </div>
-        <p class="calendar-hint">Tippe auf einen Tag, um den Stundenplan zu öffnen.</p>
+        <p class="calendar-hint">Tippe auf einen Tag, um den Stundenplan zu öffnen.</p><div class="section-heading event-heading"><div><p class="eyebrow">Auf einen Blick</p><h2>Ferien &amp; Termine</h2></div></div><div id="eventList" class="event-list"></div>
       </section>
 
       <section class="view" id="view-more" aria-labelledby="moreHeading" hidden>
@@ -97,10 +110,10 @@
           <div class="setting-row"><div class="setting-label"><strong>Heute beim Start öffnen</strong><small>Direkt deinen Tag sehen</small></div><button class="switch" id="startTodaySwitch" type="button" role="switch" aria-checked="false" aria-label="Heute beim Start öffnen"><span></span></button></div>
         </div>
         <div class="settings-card app-info-card">
-          <div class="settings-title"><span class="settings-icon tone-blue"><svg class="icon"><use href="#i-book"/></svg></span><div><strong>App-Informationen</strong><small>Stundenplan F13</small></div></div>
-          <div class="info-row"><span>App-Version</span><strong>2.0.1</strong></div>
+          <div class="settings-title"><span class="settings-icon tone-blue"><svg class="icon"><use href="#i-book"/></svg></span><div><strong>App-Informationen</strong><small>PTS · FMS 20 Wien · Klasse F13</small></div></div>
+          <div class="info-row"><span>App-Version</span><strong>3.0.0</strong></div>
           <div class="info-row"><span>Verbindung</span><strong class="online-status" id="onlineStatus"><i></i><span>Online</span></strong></div>
-          <div class="info-row about-row"><span>Über die App</span><p>Dein Stundenplan für die F13. Einmal geladen, auch ohne Internet verfügbar.</p></div>
+          <div class="info-row about-row"><span>Über die App</span><p>Für die Klasse F13 der PTS · FMS 20 Wien. Ferien nach den veröffentlichten Wiener Terminen; BPT nach Klassenangabe. Einmal geladen, auch offline verfügbar.</p></div>
         </div>
         <div class="install-card" id="installCard" hidden><div class="install-copy"><strong>Stundenplan installieren</strong><small>Wie eine App auf deinem Startbildschirm</small></div><button id="installButton" type="button" class="primary-button"><svg class="icon"><use href="#i-install"/></svg>Installieren</button></div>
         <p class="settings-footnote">Deine Einstellungen bleiben auf diesem Gerät gespeichert.</p>
@@ -113,7 +126,7 @@
       <button class="nav-item" data-view="calendar" type="button"><svg class="icon"><use href="#i-calendar"/></svg><span>Kalender</span></button>
       <button class="nav-item" data-view="more" type="button"><svg class="icon"><use href="#i-more"/></svg><span>Mehr</span></button>
     </nav>
-    <input id="datePicker" class="visually-hidden" type="date" min="2026-09-24" max="2027-07-02" aria-label="Datum auswählen">
+    <input id="datePicker" class="visually-hidden" type="date" min="2026-09-24" max="2027-09-05" aria-label="Datum auswählen">
   </div>
 
   <dialog class="lesson-dialog" id="lessonDialog" aria-labelledby="dialogSubject">
@@ -126,8 +139,8 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="./data.js?v=2.0.1" defer></script>
-  <script src="./app.js?v=2.0.1" defer></script>
+  <script src="./data.js?v=3.0.0" defer></script>
+  <script src="./app.js?v=3.0.0" defer></script>
 </body>
 </html>
 

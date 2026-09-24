@@ -1,18 +1,30 @@
 {
   "id": "./",
-  "name": "Stundenplan F13",
+  "name": "F13 Stundenplan · PTS FMS 20 Wien",
   "short_name": "F13",
-  "description": "Der Stundenplan der Klasse F13.",
+  "description": "Stundenplan, Ferien und BPT der Klasse F13 der PTS FMS 20 Wien.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
-  "background_color": "#f7f9fc",
-  "theme_color": "#f7f9fc",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#111b37",
+  "theme_color": "#111b37",
   "orientation": "portrait",
   "icons": [
-    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
-

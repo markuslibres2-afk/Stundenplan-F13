@@ -1,5 +1,5 @@
-const CACHE_NAME = "stundenplan-f13-v6";
-const SHELL_FILES = ["./", "./index.html", "./styles.css?v=2.0.1", "./data.js?v=2.0.1", "./app.js?v=2.0.1", "./manifest.json", "./icon-192.png", "./icon-512.png"];
+const CACHE_NAME = "stundenplan-f13-v7";
+const SHELL_FILES = ["./", "./index.html", "./styles.css?v=3.0.0", "./data.js?v=3.0.0", "./app.js?v=3.0.0", "./manifest.json", "./brand-mark.svg", "./icon-192.png", "./icon-512.png"];
 const SHELL_URLS = SHELL_FILES.map((path) => new URL(path, self.registration.scope).href);
 
 self.addEventListener("install", (event) => {

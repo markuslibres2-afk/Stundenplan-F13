@@ -8,6 +8,26 @@
   const SHORT_DAYS = ["SO", "MO", "DI", "MI", "DO", "FR", "SA"];
   const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
   const TYPE_LABELS = { normal: "Unterricht", practice: "Praxistag", cancelled: "Entfallen", substitution: "Vertretung", changed: "Geändert", free: "Frei" };
+  const SUBJECTS = {
+    M: { icon: "math", tone: "blue" }, D: { icon: "language", tone: "coral" },
+    E: { icon: "english", tone: "mint" }, PBW: { icon: "people", tone: "violet" },
+    IKF: { icon: "screen", tone: "cyan" }, BUS: { icon: "briefcase", tone: "amber" },
+    PRAXISTAG: { icon: "briefcase", tone: "amber" }, BOL: { icon: "compass", tone: "rose" },
+    ISB: { icon: "network", tone: "indigo" }, DGB: { icon: "shapes", tone: "lime" },
+    "BF – D, M, E": { icon: "language", tone: "coral" }, X: { icon: "spark", tone: "slate" }
+  };
+  const subjectInfo = (subject) => SUBJECTS[subject] || { icon: "language", tone: "slate" };
+  const subjectMark = (subject, extra = "") => {
+    const info = subjectInfo(subject);
+    return `<span class="subject-mark tone-${info.tone} ${extra}" aria-hidden="true"><svg class="icon"><use href="#s-${info.icon}"/></svg></span>`;
+  };
+  const periodFor = (date) => {
+    const key = dateKey(date);
+    return (DATA.periods || []).find((period) => key >= period.start && key <= period.end) || null;
+  };
+  const periodIcon = (period) => period.kind === "bpt" ? "briefcase" : "sun";
+  const periodDisplay = (period) => period.kind === "bpt" ? "BPT" : period.note === "Schulfrei" ? "Schulfrei" : "Ferien";
+  const periodCard = (period, compact = false) => `<div class="period-card period-${period.kind}${compact ? " compact" : ""}"><span class="period-icon"><svg class="icon"><use href="#s-${periodIcon(period)}"/></svg></span><div class="period-copy"><span class="period-kicker">${periodDisplay(period)}</span><strong>${escapeHtml(period.title)}</strong><span>${escapeHtml(period.note)}</span></div></div>`;
   const STORAGE = { dark: "stundenplan-f13-dark", startToday: "stundenplan-f13-start-today" };
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -63,7 +83,7 @@
   if (!["today", "schedule", "calendar", "more"].includes(state.view)) state.view = "schedule";
 
   function lessonsFor(date) {
-    if (!inRange(date)) return [];
+    if (!inRange(date) || periodFor(date)) return [];
     const rows = DATA.weekdays[date.getDay()] || [];
     return rows.map(([start, end, subject, legacyType]) => {
       const type = legacyType === "practice" ? "practice" : "normal";
@@ -86,11 +106,11 @@
     const remaining = isCurrent ? Math.max(0, minutesOf(lesson.end) - minutes) : 0;
     const durationText = duration === 1 ? "1 Minute" : `${duration} Minuten`;
     const meta = lesson.teacher || lesson.room ? `${lesson.teacher ? `Lehrkraft ${escapeHtml(lesson.teacher)}` : ""}${lesson.teacher && lesson.room ? " · " : ""}${lesson.room ? `Raum ${escapeHtml(lesson.room)}` : ""}` : lesson.type === "practice" ? "Praxistag" : `${TYPE_LABELS[lesson.type] || "Unterricht"} · ${durationText}`;
-    const mark = lesson.type === "practice" ? "PR" : lesson.type === "cancelled" ? "—" : lesson.type === "free" ? "F" : escapeHtml(lesson.subject.slice(0, 2).toUpperCase());
+    const info = subjectInfo(lesson.subject);
     return `<div class="lesson-row" style="animation-delay:${Math.min(index * 24, 120)}ms">
       <div class="lesson-time"><strong>${escapeHtml(lesson.start)}</strong><span>${escapeHtml(lesson.end)}</span></div>
-      <button class="lesson-card type-${escapeHtml(lesson.type)}${isCurrent ? " is-current" : ""}" type="button" data-lesson-index="${index}" aria-label="${escapeHtml(lesson.subject)}, ${escapeHtml(lesson.start)} bis ${escapeHtml(lesson.end)}${isCurrent ? ", gerade aktuell" : ""}">
-        <span class="lesson-mark" aria-hidden="true">${mark}</span>
+      <button class="lesson-card type-${escapeHtml(lesson.type)} subject-${info.tone}${isCurrent ? " is-current" : ""}" type="button" data-lesson-index="${index}" aria-label="${escapeHtml(lesson.subject)}, ${escapeHtml(lesson.start)} bis ${escapeHtml(lesson.end)}${isCurrent ? ", gerade aktuell" : ""}">
+        ${subjectMark(lesson.subject, "lesson-mark")}
         <span class="lesson-copy"><span class="lesson-subject">${escapeHtml(lesson.subject)}</span><span class="lesson-meta">${meta}</span>${isCurrent ? `<span class="current-progress"><span>Noch ${remaining} Min.</span><span class="progress-track"><span class="progress-fill" style="width:${progress}%"></span></span></span>` : ""}</span>
         <svg class="icon lesson-arrow" aria-hidden="true"><use href="#i-chevron-right"/></svg>
       </button>
@@ -102,9 +122,14 @@
   }
 
   function showEmpty(target, date, unavailable = false) {
+    const period = periodFor(date);
+    if (period) {
+      target.innerHTML = periodCard(period);
+      return;
+    }
     const inSchool = inRange(date);
     const heading = unavailable || !inSchool ? "Kein Stundenplan" : "Heute kein Unterricht";
-    const message = unavailable || !inSchool ? "Der Stundenplan ist vom 24.09.2026 bis 02.07.2027 hinterlegt." : "Für diesen Tag ist kein Unterricht eingetragen.";
+    const message = unavailable || !inSchool ? "Der Stundenplan ist vom 24.09.2026 bis 05.09.2027 hinterlegt." : "Für diesen Tag ist kein Unterricht eingetragen.";
     target.innerHTML = `<div class="empty-state"><span class="empty-icon"><svg class="icon"><use href="#i-calendar"/></svg></span><div><strong>${heading}</strong><p>${message}</p></div></div>`;
   }
 
@@ -152,19 +177,20 @@
 
   function renderWeek() {
     const monday = mondayOf(state.selectedDate);
-    const friday = new Date(monday);
-    friday.setDate(friday.getDate() + 4);
-    $("#weekLabel").textContent = `${formatWeekDate(monday)} – ${formatDate(friday)}`;
+    const sunday = new Date(monday);
+    sunday.setDate(sunday.getDate() + 6);
+    $("#weekLabel").textContent = `${formatWeekDate(monday)} – ${formatDate(sunday)}`;
     $("#prevWeek").disabled = monday <= mondayOf(parseDate(DATA.startDate));
-    $("#nextWeek").disabled = friday >= parseDate(DATA.endDate);
+    $("#nextWeek").disabled = sunday >= parseDate(DATA.endDate);
     const tabMarkup = [];
-    for (let offset = 0; offset < 5; offset += 1) {
+    for (let offset = 0; offset < 7; offset += 1) {
       const date = new Date(monday);
       date.setDate(monday.getDate() + offset);
       const disabled = !inRange(date);
       const active = sameDate(date, state.selectedDate);
       const isToday = sameDate(date, today);
-      tabMarkup.push(`<button class="day-tab${active ? " active" : ""}${isToday ? " today" : ""}" type="button" data-date="${dateKey(date)}"${disabled ? " disabled" : ""}${active ? ' aria-current="date"' : ""} aria-label="${formatFullDate(date)}${isToday ? ", heute" : ""}"><span class="day-name">${SHORT_DAYS[date.getDay()]}</span><span class="day-number">${date.getDate()}</span></button>`);
+      const period = periodFor(date);
+      tabMarkup.push(`<button class="day-tab${active ? " active" : ""}${isToday ? " today" : ""}${period ? ` period-tab period-${period.kind}` : ""}" type="button" data-date="${dateKey(date)}"${disabled ? " disabled" : ""}${active ? ' aria-current="date"' : ""} aria-label="${formatFullDate(date)}${isToday ? ", heute" : ""}"><span class="day-name">${SHORT_DAYS[date.getDay()]}</span><span class="day-number">${date.getDate()}</span></button>`);
     }
     $("#dayTabs").innerHTML = tabMarkup.join("");
     $$(".day-tab", $("#dayTabs")).forEach((button) => button.addEventListener("click", () => selectDate(parseDate(button.dataset.date))));
@@ -172,7 +198,8 @@
     $("#selectedWeekday").textContent = WEEKDAYS[state.selectedDate.getDay()];
     $("#selectedDateLabel").textContent = `${state.selectedDate.getDate()}. ${MONTHS[state.selectedDate.getMonth()]}`;
     $("#selectedDateChip").textContent = formatDate(state.selectedDate);
-    $("#daySummary").textContent = lessons.length ? `${lessons.length} ${lessons.length === 1 ? "Stunde" : "Stunden"} · ${lessons[0].start} – ${lessons[lessons.length - 1].end}` : "";
+    const period = periodFor(state.selectedDate);
+    $("#daySummary").textContent = period ? `${periodDisplay(period)} · ${period.title}` : lessons.length ? `${lessons.length} ${lessons.length === 1 ? "Stunde" : "Stunden"} · ${lessons[0].start} – ${lessons[lessons.length - 1].end}` : "";
     renderLessonList($("#scheduleLessons"), state.selectedDate, { timeline: true });
   }
 
@@ -187,8 +214,12 @@
     const activeIndex = currentLessonIndex(lessons, today, current);
     const nextIndex = activeIndex >= 0 ? activeIndex : lessons.findIndex((lesson) => minutes < minutesOf(lesson.start));
     const nextRoot = $("#nextLesson");
-    if (!inRange(today)) {
-      nextRoot.innerHTML = `<div class="empty-state"><span class="empty-icon"><svg class="icon"><use href="#i-calendar"/></svg></span><div><strong>Außerhalb des Stundenplans</strong><p>Die eingetragenen Daten reichen bis 02.07.2027.</p></div></div>`;
+    const period = periodFor(today);
+    if (period) {
+      nextRoot.innerHTML = periodCard(period, true);
+      $("#greetingSubtitle").textContent = period.kind === "bpt" ? "Diese Woche stehen die berufspraktischen Tage an." : "Heute ist schulfrei.";
+    } else if (!inRange(today)) {
+      nextRoot.innerHTML = `<div class="empty-state"><span class="empty-icon"><svg class="icon"><use href="#i-calendar"/></svg></span><div><strong>Außerhalb des Stundenplans</strong><p>Die eingetragenen Daten reichen bis 05.09.2027.</p></div></div>`;
       $("#greetingSubtitle").textContent = "Der Stundenplanzeitraum ist noch nicht aktiv.";
     } else if (!lessons.length) {
       nextRoot.innerHTML = `<div class="empty-state"><span class="empty-icon"><svg class="icon"><use href="#i-check"/></svg></span><div><strong>Heute kein Unterricht</strong><p>Genieß den freien Tag.</p></div></div>`;
@@ -199,10 +230,10 @@
     } else {
       const lesson = lessons[nextIndex];
       $("#greetingSubtitle").textContent = activeIndex >= 0 ? "Du bist gerade im Unterricht." : "Das steht als Nächstes an.";
-      nextRoot.innerHTML = `<button class="next-card type-${lesson.type === "practice" ? "practice" : "normal"}" type="button" data-next-lesson="${nextIndex}"><span class="next-time"><strong>${lesson.start}</strong><span>${lesson.end}</span></span><span class="next-copy"><strong>${escapeHtml(lesson.subject)}</strong><small>${activeIndex >= 0 ? "Gerade jetzt" : "Heute"} · ${TYPE_LABELS[lesson.type] || "Unterricht"}</small></span><svg class="icon next-arrow"><use href="#i-chevron-right"/></svg></button>`;
+      nextRoot.innerHTML = `<button class="next-card type-${lesson.type === "practice" ? "practice" : "normal"}" type="button" data-next-lesson="${nextIndex}"><span class="next-time"><strong>${lesson.start}</strong><span>${lesson.end}</span></span>${subjectMark(lesson.subject, "next-mark")}<span class="next-copy"><strong>${escapeHtml(lesson.subject)}</strong><small>${activeIndex >= 0 ? "Gerade jetzt" : "Heute"} · ${TYPE_LABELS[lesson.type] || "Unterricht"}</small></span><svg class="icon next-arrow"><use href="#i-chevron-right"/></svg></button>`;
       $("[data-next-lesson]", nextRoot).addEventListener("click", () => openLesson(lesson, today));
     }
-    $("#todayCount").textContent = lessons.length;
+    $("#todayCount").textContent = period ? periodDisplay(period) : lessons.length;
     renderLessonList($("#todayLessons"), today, { timeline: true });
   }
 
@@ -217,10 +248,11 @@
     for (let day = 1; day <= count; day += 1) {
       const date = new Date(month.getFullYear(), month.getMonth(), day);
       const hasLessons = lessonsFor(date).length > 0;
+      const period = periodFor(date);
       const selected = sameDate(date, state.selectedDate);
       const isToday = sameDate(date, today);
       const disabled = !inRange(date);
-      slots.push(`<button class="calendar-day${hasLessons ? " has-lessons" : ""}${selected ? " selected" : ""}${isToday ? " today" : ""}" type="button" role="gridcell" data-date="${dateKey(date)}"${disabled ? " disabled" : ""} aria-label="${formatFullDate(date)}${hasLessons ? ", Unterricht" : ""}${selected ? ", ausgewählt" : ""}">${day}</button>`);
+      slots.push(`<button class="calendar-day${hasLessons ? " has-lessons" : ""}${period ? ` period-${period.kind}` : ""}${selected ? " selected" : ""}${isToday ? " today" : ""}" type="button" role="gridcell" data-date="${dateKey(date)}"${disabled ? " disabled" : ""} aria-label="${formatFullDate(date)}${period ? `, ${escapeHtml(period.title)}` : hasLessons ? ", Unterricht" : ""}${selected ? ", ausgewählt" : ""}">${day}</button>`);
     }
     $("#calendarGrid").innerHTML = slots.join("");
     $$(".calendar-day", $("#calendarGrid")).forEach((button) => {
@@ -234,6 +266,16 @@
     const maxMonth = parseDate(DATA.endDate).getFullYear() * 12 + parseDate(DATA.endDate).getMonth();
     $("#prevMonth").disabled = monthIndex <= minMonth;
     $("#nextMonth").disabled = monthIndex >= maxMonth;
+    $("#eventList").innerHTML = (DATA.periods || []).map((period) => {
+      const start = parseDate(period.start);
+      const end = parseDate(period.end);
+      const dateLabel = period.start === period.end ? formatDate(start) : `${formatWeekDate(start)} – ${formatDate(end)}`;
+      return `<button class="event-item event-${period.kind}" type="button" data-event-date="${period.start}" aria-label="${escapeHtml(period.title)}, ${dateLabel}"><span class="event-icon"><svg class="icon"><use href="#s-${periodIcon(period)}"/></svg></span><span class="event-copy"><strong>${escapeHtml(period.title)}</strong><small>${dateLabel}</small></span><span class="event-tag">${periodDisplay(period)}</span><svg class="icon event-arrow"><use href="#i-chevron-right"/></svg></button>`;
+    }).join("");
+    $("[data-event-date]", $("#eventList")).forEach((button) => button.addEventListener("click", () => {
+      selectDate(parseDate(button.dataset.eventDate));
+      setView("schedule");
+    }));
   }
 
   function renderSettings() {
@@ -249,7 +291,7 @@
 
   function render() {
     document.documentElement.dataset.theme = state.dark ? "dark" : "light";
-    $('meta[name="theme-color"]').setAttribute("content", state.dark ? "#101722" : "#f7f9fc");
+    $('meta[name="theme-color"]').setAttribute("content", state.dark ? "#0b1124" : "#111b37");
     renderToday();
     renderWeek();
     renderCalendar();
@@ -265,7 +307,7 @@
 
   function changeSelectedDay(direction) {
     const next = copyDate(state.selectedDate);
-    do { next.setDate(next.getDate() + direction); } while (next.getDay() === 0 || next.getDay() === 6);
+    next.setDate(next.getDate() + direction);
     if (inRange(next)) selectDate(next);
   }
 
@@ -277,6 +319,8 @@
 
   function openLesson(lesson, date) {
     if (!lesson) return;
+    const mark = $(".dialog-subject-mark");
+    mark.outerHTML = subjectMark(lesson.subject, "dialog-subject-mark");
     $("#dialogStatus").textContent = lesson.status || TYPE_LABELS[lesson.type] || "Unterricht";
     $("#dialogSubject").textContent = lesson.subject;
     $("#dialogDate").textContent = formatFullDate(date);
@@ -336,7 +380,7 @@
     saveValue(STORAGE.dark, state.dark);
     renderSettings();
     document.documentElement.dataset.theme = state.dark ? "dark" : "light";
-    $('meta[name="theme-color"]').setAttribute("content", state.dark ? "#101722" : "#f7f9fc");
+    $('meta[name="theme-color"]').setAttribute("content", state.dark ? "#0b1124" : "#111b37");
   });
   $("#startTodaySwitch").addEventListener("click", () => {
     const value = !readBoolean(STORAGE.startToday, false);
