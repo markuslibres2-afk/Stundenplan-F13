@@ -2,88 +2,132 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#1676c8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f9fc">
+  <meta name="color-scheme" content="light dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Stundenplan">
-  <title>Stundenplan</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon-192.png">
-  <style>
-    :root{
-      --brand:#1676c8;
-      --brand-dark:#0e67b4;
-      --brand-soft:#e8f3fb;
-      --bg:#f4f6f8;
-      --card:#ffffff;
-      --line:#dfe5ea;
-      --text:#1e2933;
-      --muted:#71808d;
-      --lesson:#dff3e7;
-      --lesson-border:#2e9e65;
-      --practice:#fff0dd;
-      --practice-border:#ef8f2e;
-      --danger:#f8dfe1;
-      --danger-border:#d45561;
-      --shadow:0 2px 10px rgba(0,0,0,.06);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text)}
-    body{min-height:100vh}
-    button{font:inherit}
-    .app{max-width:760px;margin:0 auto;min-height:100vh;background:var(--bg)}
-    .top{position:sticky;top:0;z-index:30;background:var(--brand);color:#fff;padding:calc(8px + env(safe-area-inset-top)) 12px 0;box-shadow:0 2px 8px rgba(0,0,0,.18)}
-    .topline{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;height:52px}
-    .hamb,.cal{border:0;background:transparent;color:#fff;font-size:24px;border-radius:12px;height:40px;cursor:pointer}
-    .apptitle{text-align:center;font-size:20px;font-weight:700}
-    .weekrow{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:6px;padding:4px 0 10px}
-    .weekrow button{border:0;background:rgba(255,255,255,.12);color:white;border-radius:10px;height:34px;font-size:22px;cursor:pointer}
-    .weektitle{text-align:center;font-weight:600;font-size:14px}
-    .days{background:white;display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--line);position:sticky;top:106px;z-index:25}
-    .day{border:0;background:white;padding:9px 3px 8px;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted)}
-    .day .wd{font-size:11px;font-weight:800;letter-spacing:.3px}.day .dn{font-size:18px;font-weight:800;margin-top:3px;color:var(--text)}
-    .day.active{border-bottom-color:var(--brand)}.day.active .wd,.day.active .dn{color:var(--brand)}
-    .day.today .dn{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;background:var(--brand-soft);border-radius:999px}
-    .content{padding:14px 10px 90px}.datehead{font-size:18px;font-weight:750;margin:2px 4px 12px}
-    .lessonrow{display:grid;grid-template-columns:70px 1fr;gap:9px;margin-bottom:9px}
-    .time{text-align:right;padding-top:10px;color:var(--muted);font-size:12px;line-height:1.25}.time b{font-size:14px;color:#40505d}
-    .card{background:var(--lesson);border:1px solid #cce8d7;border-left:5px solid var(--lesson-border);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow);cursor:pointer;min-height:62px}
-    .card.practice{background:var(--practice);border-color:#f3d3aa;border-left-color:var(--practice-border)}
-    .subject{font-size:16px;font-weight:800}.submeta{font-size:12px;color:var(--muted);margin-top:4px}
-    .empty{background:white;border:1px solid var(--line);border-radius:12px;padding:18px;color:var(--muted)}
-    .fab{position:fixed;right:max(18px,calc((100vw - 760px)/2 + 18px));bottom:82px;width:52px;height:52px;border-radius:50%;border:0;background:var(--brand);color:white;font-size:27px;box-shadow:0 5px 18px rgba(0,0,0,.25);cursor:pointer}
-    .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;z-index:40;width:min(760px,100%);background:white;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
-    .bottom button{border:0;background:none;color:var(--muted);font-size:12px;font-weight:700;padding:7px 3px;cursor:pointer}.bottom .ico{font-size:21px;display:block;line-height:1.1;margin-bottom:2px}.bottom .active{color:var(--brand)}
-    dialog{border:0;border-radius:18px;width:min(92vw,470px);padding:0;box-shadow:0 18px 55px rgba(0,0,0,.28)}dialog::backdrop{background:rgba(0,0,0,.35)}
-    .dlghead{background:var(--brand);color:#fff;padding:18px}.dlghead h2{margin:0;font-size:20px}.dlgbody{padding:18px}
-    .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:800;color:var(--muted)}.value{margin:4px 0 16px;font-size:16px}.close{width:100%;border:0;background:var(--brand);color:white;border-radius:11px;padding:13px;font-weight:800}
-    #picker{position:absolute;opacity:0;pointer-events:none}.installbar{display:none;margin:0 10px 10px;background:white;border:1px solid var(--line);border-radius:12px;padding:12px;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--shadow)}.installbar.show{display:flex}.installbar span{font-size:13px;color:var(--muted)}.installbar button{border:0;background:var(--brand);color:#fff;border-radius:10px;padding:9px 12px;font-weight:700}
-    @media(max-width:420px){.lessonrow{grid-template-columns:63px 1fr}}
-  </style>
+  <meta name="apple-mobile-web-app-title" content="Stundenplan F13">
+  <meta name="description" content="Der Stundenplan der Klasse F13 – übersichtlich, schnell und offline verfügbar.">
+  <title>Stundenplan F13</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<div class="app">
-  <header class="top"><div class="topline"><button class="hamb" aria-label="Menü">☰</button><div class="apptitle">Stundenplan</div><button class="cal" id="calBtn" aria-label="Kalender">▣</button><input id="picker" type="date" min="2026-09-24" max="2027-07-02"></div><div class="weekrow"><button id="prev">‹</button><div class="weektitle" id="weektitle"></div><button id="next">›</button></div></header>
-  <nav class="days" id="days"></nav>
-  <div class="installbar" id="installbar"><span>Als App auf deinem Handy installieren</span><button id="installBtn">Installieren</button></div>
-  <main class="content"><div class="datehead" id="datehead"></div><section id="schedule"></section></main>
-  <button class="fab" id="todayFab" title="Heute">⌂</button>
-  <nav class="bottom"><button class="active"><span class="ico">▦</span>Stundenplan</button><button id="todayBottom"><span class="ico">●</span>Heute</button><button><span class="ico">☷</span>Mehr</button></nav>
-</div>
-<dialog id="dlg"><div class="dlghead"><h2 id="dSubject"></h2></div><div class="dlgbody"><div class="label">Datum</div><div class="value" id="dDate"></div><div class="label">Zeit</div><div class="value" id="dTime"></div><div class="label">Typ</div><div class="value" id="dType"></div><button class="close" onclick="dlg.close()">Schließen</button></div></dialog>
-<script>
-const START=new Date(2026,8,24), END=new Date(2027,6,2);
-const DAYN=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"],DAYS=["SO","MO","DI","MI","DO","FR","SA"],MONTHS=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-const TT={1:[["08:00","08:50","M"],["09:00","09:50","D"],["10:05","10:55","PBW"],["11:05","11:55","E"],["12:05","12:55","IKF"],["14:00","14:50","BUS"],["14:55","15:45","BUS"]],2:[["08:00","17:35","PRAXISTAG","practice"]],3:[["08:00","08:50","D"],["09:00","09:50","M"],["10:05","10:55","BOL"],["11:05","11:55","PBW"],["12:05","12:55","ISB"],["13:00","13:50","BF – D, M, E"]],4:[["08:00","08:50","IKF"],["09:00","09:50","M"],["10:05","10:55","E"],["11:05","11:55","BOL"],["12:05","12:55","D"]],5:[["08:00","08:50","X"],["09:00","09:50","ISB"],["10:05","10:55","E"],["11:05","11:55","DGB"],["12:05","12:55","PBW"]]};
-const copy=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()),same=(a,b)=>a.getFullYear()==b.getFullYear()&&a.getMonth()==b.getMonth()&&a.getDate()==b.getDate(),fmt=d=>`${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`,clamp=d=>d<START?copy(START):d>END?copy(END):copy(d);
-function monday(d){d=copy(d);let n=d.getDay();d.setDate(d.getDate()+(n===0?-6:1-n));return d}function localToday(){let d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
-let selected=clamp(localToday());if(selected.getDay()==0)selected.setDate(selected.getDate()+1);if(selected.getDay()==6)selected.setDate(selected.getDate()+2);selected=clamp(selected);
-function choose(d){d=clamp(d);if(d.getDay()==6)d.setDate(d.getDate()+2);if(d.getDay()==0)d.setDate(d.getDate()+1);selected=clamp(d);render()}
-function render(){const m=monday(selected),f=new Date(m);f.setDate(m.getDate()+4);weektitle.textContent=`${fmt(m)} – ${fmt(f)}`;days.innerHTML="";for(let i=0;i<5;i++){const d=new Date(m);d.setDate(m.getDate()+i);const b=document.createElement("button");b.className="day";if(same(d,selected))b.classList.add("active");if(same(d,localToday()))b.classList.add("today");if(d<START||d>END){b.disabled=true;b.style.opacity=".35"}b.innerHTML=`<div class="wd">${DAYS[d.getDay()]}</div><div class="dn">${d.getDate()}</div>`;b.onclick=()=>choose(d);days.appendChild(b)}datehead.textContent=`${DAYN[selected.getDay()]}, ${selected.getDate()}. ${MONTHS[selected.getMonth()]} ${selected.getFullYear()}`;schedule.innerHTML="";const arr=TT[selected.getDay()]||[];if(!arr.length){schedule.innerHTML='<div class="empty">Kein Unterricht eingetragen.</div>';return}arr.forEach(e=>{const[a,b,s,t]=e,row=document.createElement("div");row.className="lessonrow";row.innerHTML=`<div class="time"><b>${a}</b><br>${b}</div><div class="card ${t==="practice"?"practice":""}"><div class="subject">${s}</div><div class="submeta">${t==="practice"?"Praxistag":"Unterricht"}</div></div>`;row.querySelector(".card").onclick=()=>openDlg(s,a,b,t);schedule.appendChild(row)})}
-function openDlg(s,a,b,t){dSubject.textContent=s;dDate.textContent=`${DAYN[selected.getDay()]}, ${fmt(selected)}`;dTime.textContent=`${a} – ${b}`;dType.textContent=t==="practice"?"Praxistag":"Unterricht";dlg.showModal()}
-prev.onclick=()=>{let d=copy(selected);d.setDate(d.getDate()-7);choose(d)};next.onclick=()=>{let d=copy(selected);d.setDate(d.getDate()+7);choose(d)};todayFab.onclick=todayBottom.onclick=()=>choose(localToday());calBtn.onclick=()=>{picker.value=`${selected.getFullYear()}-${String(selected.getMonth()+1).padStart(2,"0")}-${String(selected.getDate()).padStart(2,"0")}`;if(picker.showPicker)picker.showPicker();else picker.click()};picker.onchange=()=>{let[y,m,d]=picker.value.split("-").map(Number);choose(new Date(y,m-1,d))};
-if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js")}let deferredPrompt=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;installbar.classList.add("show")});installBtn.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installbar.classList.remove("show")};window.addEventListener("appinstalled",()=>installbar.classList.remove("show"));render();
-</script>
+  <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M7.5 3.5v3M16.5 3.5v3M4 9h16M8 12.5h.01M12 12.5h.01M16 12.5h.01M8 16h.01M12 16h.01"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3.5 10 8.5-7 8.5 7v9a1.5 1.5 0 0 1-1.5 1.5h-14A1.5 1.5 0 0 1 3.5 19z"/><path d="M9 20.5v-7h6v7"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16.5" rx="2.5"/><path d="M3.5 9h17M8.5 9v11.5M14.5 9v11.5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 5.5v14A2.5 2.5 0 0 1 6.5 17H20"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M3 9.5a14 14 0 0 1 18 0M6.5 13a8.7 8.7 0 0 1 11 0M10 16.5a3.3 3.3 0 0 1 4 0"/><circle cx="12" cy="20" r=".8"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2.5 12h2m15 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 15A8.5 8.5 0 0 1 9 3.5 8.5 8.5 0 1 0 20.5 15Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.3 4.3L19.5 6.8"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-install" viewBox="0 0 24 24"><path d="M12 3v11m-4-4 4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <header class="app-bar">
+      <div class="brand-lockup" aria-label="Stundenplan F13">
+        <span class="brand-icon"><svg class="icon"><use href="#i-calendar"/></svg></span>
+        <span class="brand-copy"><span class="brand-overline">F13</span><span class="brand-name">Stundenplan</span></span>
+      </div>
+      <div class="app-bar-actions">
+        <button class="icon-button" id="quickToday" type="button" aria-label="Zur heutigen Woche" title="Heute"><svg class="icon"><use href="#i-home"/></svg></button>
+        <button class="icon-button" id="quickCalendar" type="button" aria-label="Datum auswählen" title="Datum auswählen"><svg class="icon"><use href="#i-calendar"/></svg></button>
+      </div>
+    </header>
+
+    <main id="mainContent" class="main-content">
+      <section class="view" id="view-today" aria-labelledby="todayHeading">
+        <div class="greeting-card">
+          <div class="greeting-copy">
+            <p class="eyebrow" id="greetingDate"></p>
+            <h1 id="todayHeading">Guten Morgen</h1>
+            <p class="greeting-subtitle" id="greetingSubtitle">Dein Überblick für heute.</p>
+          </div>
+          <div class="greeting-art" aria-hidden="true"><span class="art-orbit orbit-one"></span><span class="art-orbit orbit-two"></span><span class="art-calendar"><svg class="icon"><use href="#i-calendar"/></svg></span></div>
+        </div>
+        <div class="section-heading"><div><p class="eyebrow">Als Nächstes</p><h2>Nächste Stunde</h2></div><button class="text-button" data-go="schedule">Stundenplan <svg class="icon"><use href="#i-chevron-right"/></svg></button></div>
+        <div id="nextLesson" class="next-lesson"></div>
+        <div class="section-heading today-list-heading"><div><p class="eyebrow">Dein Tag</p><h2>Heute</h2></div><span class="count-badge" id="todayCount"></span></div>
+        <div id="todayLessons" class="lesson-list"></div>
+      </section>
+
+      <section class="view" id="view-schedule" aria-labelledby="scheduleHeading" hidden>
+        <div class="screen-heading"><div><p class="eyebrow">F13 · Schuljahr 2026/27</p><h1 id="scheduleHeading">Stundenplan</h1></div><button class="date-button" id="pickDate" type="button"><svg class="icon"><use href="#i-calendar"/></svg><span>Datum</span></button></div>
+        <div class="schedule-sticky">
+          <div class="week-switcher">
+            <button class="round-button" id="prevWeek" type="button" aria-label="Vorherige Woche"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+            <button class="week-label" id="weekLabel" type="button" aria-label="Heute anzeigen"></button>
+            <button class="round-button" id="nextWeek" type="button" aria-label="Nächste Woche"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
+          </div>
+          <nav class="day-tabs" id="dayTabs" aria-label="Wochentage"></nav>
+        </div>
+        <div class="selected-date-row"><div><p class="eyebrow" id="selectedWeekday"></p><h2 id="selectedDateLabel"></h2></div><span class="date-chip" id="selectedDateChip"></span></div>
+        <div class="day-summary" id="daySummary"></div>
+        <div id="scheduleLessons" class="lesson-list"></div>
+      </section>
+
+      <section class="view" id="view-calendar" aria-labelledby="calendarHeading" hidden>
+        <div class="screen-heading"><div><p class="eyebrow">Schuljahr 2026/27</p><h1 id="calendarHeading">Kalender</h1></div><button class="date-button" id="calendarToday" type="button"><svg class="icon"><use href="#i-home"/></svg><span>Heute</span></button></div>
+        <div class="calendar-card">
+          <div class="month-toolbar"><button class="round-button" id="prevMonth" type="button" aria-label="Vorheriger Monat"><svg class="icon"><use href="#i-chevron-left"/></svg></button><h2 id="monthTitle"></h2><button class="round-button" id="nextMonth" type="button" aria-label="Nächster Monat"><svg class="icon"><use href="#i-chevron-right"/></svg></button></div>
+          <div class="calendar-weekdays" aria-hidden="true"><span>MO</span><span>DI</span><span>MI</span><span>DO</span><span>FR</span><span>SA</span><span>SO</span></div>
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Monatskalender"></div>
+          <div class="calendar-legend"><span class="legend-dot"></span>Tage mit Unterricht</div>
+        </div>
+        <p class="calendar-hint">Tippe auf einen Tag, um den Stundenplan zu öffnen.</p>
+      </section>
+
+      <section class="view" id="view-more" aria-labelledby="moreHeading" hidden>
+        <div class="screen-heading"><div><p class="eyebrow">Deine App</p><h1 id="moreHeading">Mehr</h1></div></div>
+        <div class="settings-card">
+          <div class="settings-title"><span class="settings-icon tone-violet"><svg class="icon"><use href="#i-sun"/></svg></span><div><strong>Darstellung</strong><small>So wie es für dich passt</small></div></div>
+          <div class="setting-row"><div class="setting-label"><strong>Dark Mode</strong><small>Angenehm bei wenig Licht</small></div><button class="switch" id="darkModeSwitch" type="button" role="switch" aria-checked="false" aria-label="Dark Mode"><span></span></button></div>
+          <div class="setting-row"><div class="setting-label"><strong>Heute beim Start öffnen</strong><small>Direkt deinen Tag sehen</small></div><button class="switch" id="startTodaySwitch" type="button" role="switch" aria-checked="false" aria-label="Heute beim Start öffnen"><span></span></button></div>
+        </div>
+        <div class="settings-card app-info-card">
+          <div class="settings-title"><span class="settings-icon tone-blue"><svg class="icon"><use href="#i-book"/></svg></span><div><strong>App-Informationen</strong><small>Stundenplan F13</small></div></div>
+          <div class="info-row"><span>App-Version</span><strong>2.0.0</strong></div>
+          <div class="info-row"><span>Verbindung</span><strong class="online-status" id="onlineStatus"><i></i><span>Online</span></strong></div>
+          <div class="info-row about-row"><span>Über die App</span><p>Dein Stundenplan für die F13. Einmal geladen, auch ohne Internet verfügbar.</p></div>
+        </div>
+        <div class="install-card" id="installCard" hidden><div class="install-copy"><strong>Stundenplan installieren</strong><small>Wie eine App auf deinem Startbildschirm</small></div><button id="installButton" type="button" class="primary-button"><svg class="icon"><use href="#i-install"/></svg>Installieren</button></div>
+        <p class="settings-footnote">Deine Einstellungen bleiben auf diesem Gerät gespeichert.</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Hauptnavigation">
+      <button class="nav-item" data-view="today" type="button"><svg class="icon"><use href="#i-home"/></svg><span>Heute</span></button>
+      <button class="nav-item" data-view="schedule" type="button"><svg class="icon"><use href="#i-grid"/></svg><span>Stundenplan</span></button>
+      <button class="nav-item" data-view="calendar" type="button"><svg class="icon"><use href="#i-calendar"/></svg><span>Kalender</span></button>
+      <button class="nav-item" data-view="more" type="button"><svg class="icon"><use href="#i-more"/></svg><span>Mehr</span></button>
+    </nav>
+    <input id="datePicker" class="visually-hidden" type="date" min="2026-09-24" max="2027-07-02" aria-label="Datum auswählen">
+  </div>
+
+  <dialog class="lesson-dialog" id="lessonDialog" aria-labelledby="dialogSubject">
+    <div class="dialog-grabber" aria-hidden="true"></div>
+    <div class="dialog-header"><span class="dialog-subject-mark"><svg class="icon"><use href="#i-book"/></svg></span><button class="dialog-close" id="closeDialog" type="button" aria-label="Schließen"><svg class="icon"><use href="#i-close"/></svg></button></div>
+    <div class="dialog-content"><p class="eyebrow" id="dialogStatus">Unterricht</p><h2 id="dialogSubject"></h2><p class="dialog-date" id="dialogDate"></p>
+      <div class="detail-grid"><div class="detail-item"><span class="detail-icon"><svg class="icon"><use href="#i-clock"/></svg></span><div><small>Beginn</small><strong id="dialogStart"></strong></div></div><div class="detail-item"><span class="detail-icon"><svg class="icon"><use href="#i-clock"/></svg></span><div><small>Ende</small><strong id="dialogEnd"></strong></div></div><div class="detail-item"><span class="detail-icon"><svg class="icon"><use href="#i-book"/></svg></span><div><small>Lehrer</small><strong id="dialogTeacher"></strong></div></div><div class="detail-item"><span class="detail-icon"><svg class="icon"><use href="#i-pin"/></svg></span><div><small>Raum</small><strong id="dialogRoom"></strong></div></div></div>
+    </div>
+    <div class="dialog-footer"><button class="primary-button dialog-done" id="doneDialog" type="button">Fertig</button></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./data.js" defer></script>
+  <script src="./app.js" defer></script>
 </body>
 </html>
+
