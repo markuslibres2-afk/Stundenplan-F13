@@ -155,6 +155,8 @@
     const friday = new Date(monday);
     friday.setDate(friday.getDate() + 4);
     $("#weekLabel").textContent = `${formatWeekDate(monday)} – ${formatDate(friday)}`;
+    $("#prevWeek").disabled = monday <= mondayOf(parseDate(DATA.startDate));
+    $("#nextWeek").disabled = friday >= parseDate(DATA.endDate);
     const tabMarkup = [];
     for (let offset = 0; offset < 5; offset += 1) {
       const date = new Date(monday);

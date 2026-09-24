@@ -86,6 +86,7 @@ button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 48%, t
 .app-bar-actions { display: flex; gap: 7px; }
 .icon-button, .round-button { display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); color: var(--muted-strong); cursor: pointer; transition: transform .18s var(--ease), background .18s, color .18s; }
 .icon-button:hover, .round-button:hover { transform: translateY(-1px); background: var(--brand-softer); color: var(--brand); }
+.round-button:disabled { opacity: .34; cursor: not-allowed; transform: none; }
 .icon-button .icon, .round-button .icon { width: 20px; height: 20px; }
 .main-content { width: min(100%, 900px); margin: 0 auto; padding: 24px 22px 35px; }
 .view { animation: view-in .34s var(--ease) both; }
