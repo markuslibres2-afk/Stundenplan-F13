@@ -1,4 +1,4 @@
-const CACHE_NAME = "stundenplan-f13-v3";
+const CACHE_NAME = "stundenplan-f13-v4";
 const SHELL_FILES = ["./", "./index.html", "./styles.css", "./data.js", "./app.js", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 const SHELL_URLS = SHELL_FILES.map((path) => new URL(path, self.registration.scope).href);
 

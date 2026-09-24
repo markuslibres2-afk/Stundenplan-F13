@@ -8,7 +8,7 @@
   const SHORT_DAYS = ["SO", "MO", "DI", "MI", "DO", "FR", "SA"];
   const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
   const TYPE_LABELS = { normal: "Unterricht", practice: "Praxistag", cancelled: "Entfallen", substitution: "Vertretung", changed: "Geändert", free: "Frei" };
-  const STORAGE = { dark: "stundenplan-f13-dark", startToday: "stundenplan-f13-start-today", view: "stundenplan-f13-view" };
+  const STORAGE = { dark: "stundenplan-f13-dark", startToday: "stundenplan-f13-start-today" };
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const parseDate = (key) => {
@@ -51,14 +51,11 @@
   };
 
   let today = copyDate(new Date());
-  const savedView = (() => {
-    try { return localStorage.getItem(STORAGE.view); } catch (_) { return null; }
-  })();
   const startOnToday = readBoolean(STORAGE.startToday, false);
   const state = {
     selectedDate: clampDate(today),
     calendarMonth: firstOfMonth(clampDate(today)),
-    view: startOnToday ? "today" : (savedView || "schedule"),
+    view: startOnToday ? "today" : "schedule",
     dark: readBoolean(STORAGE.dark, false),
     installPrompt: null,
     toastTimer: null
@@ -139,7 +136,7 @@
     bindLessonButtons(target, date, lessons);
   }
 
-  function setView(view, { persist = true } = {}) {
+  function setView(view) {
     if (!["today", "schedule", "calendar", "more"].includes(view)) return;
     state.view = view;
     $$(".view").forEach((section) => { section.hidden = section.id !== `view-${view}`; });
@@ -149,7 +146,6 @@
       if (active) button.setAttribute("aria-current", "page");
       else button.removeAttribute("aria-current");
     });
-    if (persist) saveValue(STORAGE.view, view);
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -343,7 +339,6 @@
   $("#startTodaySwitch").addEventListener("click", () => {
     const value = !readBoolean(STORAGE.startToday, false);
     saveValue(STORAGE.startToday, value);
-    saveValue(STORAGE.view, value ? "today" : "schedule");
     renderSettings();
     showToast(value ? "Beim nächsten Start öffnet sich Heute." : "Beim nächsten Start öffnet sich der Stundenplan.");
   });
@@ -385,7 +380,7 @@
   }
 
   render();
-  setView(state.view, { persist: false });
+  setView(state.view);
   window.setInterval(() => {
     const currentDate = copyDate(new Date());
     if (!sameDate(currentDate, today)) {
