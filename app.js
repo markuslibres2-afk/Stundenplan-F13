@@ -26,6 +26,7 @@
     return (DATA.periods || []).find((period) => key >= period.start && key <= period.end) || null;
   };
   const periodIcon = (period) => period.kind === "bpt" ? "briefcase" : "sun";
+  const assessmentFor = (date) => (DATA.assessments || []).find((event) => event.date === dateKey(date)) || null;
   const periodDisplay = (period) => period.kind === "bpt" ? "BPT" : period.note === "Schulfrei" ? "Schulfrei" : "Ferien";
   const periodCard = (period, compact = false) => `<div class="period-card period-${period.kind}${compact ? " compact" : ""}"><span class="period-icon"><svg class="icon"><use href="#s-${periodIcon(period)}"/></svg></span><div class="period-copy"><span class="period-kicker">${periodDisplay(period)}</span><strong>${escapeHtml(period.title)}</strong><span>${escapeHtml(period.note)}</span></div></div>`;
   const STORAGE = { dark: "stundenplan-f13-dark", startToday: "stundenplan-f13-start-today" };
@@ -199,7 +200,10 @@
     $("#selectedDateLabel").textContent = `${state.selectedDate.getDate()}. ${MONTHS[state.selectedDate.getMonth()]}`;
     $("#selectedDateChip").textContent = formatDate(state.selectedDate);
     const period = periodFor(state.selectedDate);
-    $("#daySummary").textContent = period ? `${periodDisplay(period)} · ${period.title}` : lessons.length ? `${lessons.length} ${lessons.length === 1 ? "Stunde" : "Stunden"} · ${lessons[0].start} – ${lessons[lessons.length - 1].end}` : "";
+    const assessment = assessmentFor(state.selectedDate);
+    const lessonSummary = lessons.length ? `${lessons.length} ${lessons.length === 1 ? "Stunde" : "Stunden"} · ${lessons[0].start} – ${lessons[lessons.length - 1].end}` : "";
+    $("#daySummary").classList.toggle("has-assessment", Boolean(assessment));
+    $("#daySummary").textContent = period ? `${periodDisplay(period)} · ${period.title}` : [assessment?.title, lessonSummary].filter(Boolean).join(" · ");
     renderLessonList($("#scheduleLessons"), state.selectedDate, { timeline: true });
   }
 
@@ -233,6 +237,20 @@
       nextRoot.innerHTML = `<button class="next-card type-${lesson.type === "practice" ? "practice" : "normal"}" type="button" data-next-lesson="${nextIndex}"><span class="next-time"><strong>${lesson.start}</strong><span>${lesson.end}</span></span>${subjectMark(lesson.subject, "next-mark")}<span class="next-copy"><strong>${escapeHtml(lesson.subject)}</strong><small>${activeIndex >= 0 ? "Gerade jetzt" : "Heute"} · ${TYPE_LABELS[lesson.type] || "Unterricht"}</small></span><svg class="icon next-arrow"><use href="#i-chevron-right"/></svg></button>`;
       $("[data-next-lesson]", nextRoot).addEventListener("click", () => openLesson(lesson, today));
     }
+    const nextAssessment = (DATA.assessments || []).find((event) => event.date >= dateKey(today));
+    const preview = $("#assessmentPreview");
+    const card = $("#nextAssessmentCard");
+    preview.hidden = !nextAssessment;
+    if (nextAssessment) {
+      const examDate = parseDate(nextAssessment.date);
+      const dayDifference = Math.round((examDate - copyDate(today)) / 86400000);
+      const countdown = dayDifference === 0 ? "Heute" : dayDifference === 1 ? "Morgen" : `In ${dayDifference} Tagen`;
+      card.innerHTML = `<button class="assessment-card" type="button" data-assessment-date="${nextAssessment.date}"><span class="assessment-card-icon"><svg class="icon"><use href="#s-${nextAssessment.icon}"/></svg></span><span class="assessment-card-copy"><strong>${escapeHtml(nextAssessment.subject)}</strong><small>${formatFullDate(examDate)}</small></span><span class="assessment-countdown">${countdown}</span><svg class="icon assessment-arrow"><use href="#i-chevron-right"/></svg></button>`;
+      $("[data-assessment-date]", card).addEventListener("click", () => {
+        selectDate(examDate);
+        setView("schedule");
+      });
+    }
     $("#todayCount").textContent = period ? periodDisplay(period) : lessons.length;
     renderLessonList($("#todayLessons"), today, { timeline: true });
   }
@@ -249,10 +267,11 @@
       const date = new Date(month.getFullYear(), month.getMonth(), day);
       const hasLessons = lessonsFor(date).length > 0;
       const period = periodFor(date);
+      const assessment = assessmentFor(date);
       const selected = sameDate(date, state.selectedDate);
       const isToday = sameDate(date, today);
       const disabled = !inRange(date);
-      slots.push(`<button class="calendar-day${hasLessons ? " has-lessons" : ""}${period ? ` period-${period.kind}` : ""}${selected ? " selected" : ""}${isToday ? " today" : ""}" type="button" role="gridcell" data-date="${dateKey(date)}"${disabled ? " disabled" : ""} aria-label="${formatFullDate(date)}${period ? `, ${escapeHtml(period.title)}` : hasLessons ? ", Unterricht" : ""}${selected ? ", ausgewählt" : ""}">${day}</button>`);
+      slots.push(`<button class="calendar-day${hasLessons ? " has-lessons" : ""}${period ? ` period-${period.kind}` : ""}${assessment ? " has-assessment" : ""}${selected ? " selected" : ""}${isToday ? " today" : ""}" type="button" role="gridcell" data-date="${dateKey(date)}"${disabled ? " disabled" : ""} aria-label="${formatFullDate(date)}${period ? `, ${escapeHtml(period.title)}` : hasLessons ? ", Unterricht" : ""}${assessment ? `, ${escapeHtml(assessment.title)}` : ""}${selected ? ", ausgewählt" : ""}">${day}</button>`);
     }
     $("#calendarGrid").innerHTML = slots.join("");
     $$(".calendar-day", $("#calendarGrid")).forEach((button) => {
@@ -266,13 +285,19 @@
     const maxMonth = parseDate(DATA.endDate).getFullYear() * 12 + parseDate(DATA.endDate).getMonth();
     $("#prevMonth").disabled = monthIndex <= minMonth;
     $("#nextMonth").disabled = monthIndex >= maxMonth;
-    $("#eventList").innerHTML = (DATA.periods || []).map((period) => {
-      const start = parseDate(period.start);
-      const end = parseDate(period.end);
-      const dateLabel = period.start === period.end ? formatDate(start) : `${formatWeekDate(start)} – ${formatDate(end)}`;
-      return `<button class="event-item event-${period.kind}" type="button" data-event-date="${period.start}" aria-label="${escapeHtml(period.title)}, ${dateLabel}"><span class="event-icon"><svg class="icon"><use href="#s-${periodIcon(period)}"/></svg></span><span class="event-copy"><strong>${escapeHtml(period.title)}</strong><small>${dateLabel}</small></span><span class="event-tag">${periodDisplay(period)}</span><svg class="icon event-arrow"><use href="#i-chevron-right"/></svg></button>`;
+    const calendarEvents = [
+      ...(DATA.periods || []).map((period) => ({ ...period, date: period.start, eventType: "period" })),
+      ...(DATA.assessments || []).map((event) => ({ ...event, start: event.date, end: event.date, kind: "assessment", note: event.subject, eventType: "assessment" }))
+    ].sort((left, right) => left.date.localeCompare(right.date));
+    $("#eventList").innerHTML = calendarEvents.map((event) => {
+      const start = parseDate(event.start);
+      const end = parseDate(event.end);
+      const dateLabel = event.start === event.end ? formatDate(start) : `${formatWeekDate(start)} – ${formatDate(end)}`;
+      const icon = event.eventType === "assessment" ? event.icon : periodIcon(event);
+      const tag = event.eventType === "assessment" ? "Schularbeit" : periodDisplay(event);
+      return `<button class="event-item event-${event.kind}" type="button" data-event-date="${event.date}" aria-label="${escapeHtml(event.title)}, ${dateLabel}"><span class="event-icon"><svg class="icon"><use href="#s-${icon}"/></svg></span><span class="event-copy"><strong>${escapeHtml(event.title)}</strong><small>${dateLabel}</small></span><span class="event-tag">${tag}</span><svg class="icon event-arrow"><use href="#i-chevron-right"/></svg></button>`;
     }).join("");
-    $("[data-event-date]", $("#eventList")).forEach((button) => button.addEventListener("click", () => {
+    $$("[data-event-date]", $("#eventList")).forEach((button) => button.addEventListener("click", () => {
       selectDate(parseDate(button.dataset.eventDate));
       setView("schedule");
     }));

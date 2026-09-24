@@ -13,7 +13,7 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=3.0.0">
+  <link rel="stylesheet" href="./styles.css?v=3.1.0">
 </head>
 <body>
   <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -46,6 +46,7 @@
     <symbol id="s-spark" viewBox="0 0 24 24"><path d="m12 2 1.8 7.2L21 11l-7.2 1.8L12 20l-1.8-7.2L3 11l7.2-1.8z"/></symbol>
     <symbol id="s-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M7.5 3v4M16.5 3v4M4 10h16m-11 5 2 2 4-4"/></symbol>
     <symbol id="s-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></symbol>
+    <symbol id="s-pencil" viewBox="0 0 24 24"><path d="m4 16.5 11-11a2.1 2.1 0 0 1 3 3L7 19.5 3 21zM13.5 6.5l4 4M3.5 21h17"/></symbol>
   </svg>
 
   <div class="app-shell">
@@ -72,6 +73,10 @@
         </div>
         <div class="section-heading"><div><p class="eyebrow">Als Nächstes</p><h2>Nächste Stunde</h2></div><button class="text-button" data-go="schedule">Stundenplan <svg class="icon"><use href="#i-chevron-right"/></svg></button></div>
         <div id="nextLesson" class="next-lesson"></div>
+        <section class="upcoming-assessment" id="assessmentPreview" hidden>
+          <div class="section-heading"><div><p class="eyebrow">Das kommt näher</p><h2>Nächste Schularbeit</h2></div></div>
+          <div id="nextAssessmentCard"></div>
+        </section>
         <div class="section-heading today-list-heading"><div><p class="eyebrow">Dein Tag</p><h2>Heute</h2></div><span class="count-badge" id="todayCount"></span></div>
         <div id="todayLessons" class="lesson-list"></div>
       </section>
@@ -97,9 +102,9 @@
           <div class="month-toolbar"><button class="round-button" id="prevMonth" type="button" aria-label="Vorheriger Monat"><svg class="icon"><use href="#i-chevron-left"/></svg></button><h2 id="monthTitle"></h2><button class="round-button" id="nextMonth" type="button" aria-label="Nächster Monat"><svg class="icon"><use href="#i-chevron-right"/></svg></button></div>
           <div class="calendar-weekdays" aria-hidden="true"><span>MO</span><span>DI</span><span>MI</span><span>DO</span><span>FR</span><span>SA</span><span>SO</span></div>
           <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Monatskalender"></div>
-          <div class="calendar-legend"><span><i class="legend-dot"></i>Unterricht</span><span><i class="legend-dot legend-bpt"></i>BPT</span><span><i class="legend-dot legend-holiday"></i>Schulfrei</span></div>
+          <div class="calendar-legend"><span><i class="legend-dot"></i>Unterricht</span><span><i class="legend-dot legend-bpt"></i>BPT</span><span><i class="legend-dot legend-holiday"></i>Schulfrei</span><span><i class="legend-dot legend-assessment"></i>Schularbeit</span></div>
         </div>
-        <p class="calendar-hint">Tippe auf einen Tag, um den Stundenplan zu öffnen.</p><div class="section-heading event-heading"><div><p class="eyebrow">Auf einen Blick</p><h2>Ferien &amp; Termine</h2></div></div><div id="eventList" class="event-list"></div>
+        <p class="calendar-hint">Tippe auf einen Tag, um den Stundenplan zu öffnen.</p><div class="section-heading event-heading"><div><p class="eyebrow">Auf einen Blick</p><h2>Ferien &amp; Schularbeiten</h2></div></div><div id="eventList" class="event-list"></div>
       </section>
 
       <section class="view" id="view-more" aria-labelledby="moreHeading" hidden>
@@ -111,7 +116,7 @@
         </div>
         <div class="settings-card app-info-card">
           <div class="settings-title"><span class="settings-icon tone-blue"><svg class="icon"><use href="#i-book"/></svg></span><div><strong>App-Informationen</strong><small>PTS · FMS 20 Wien · Klasse F13</small></div></div>
-          <div class="info-row"><span>App-Version</span><strong>3.0.0</strong></div>
+          <div class="info-row"><span>App-Version</span><strong>3.1.0</strong></div>
           <div class="info-row"><span>Verbindung</span><strong class="online-status" id="onlineStatus"><i></i><span>Online</span></strong></div>
           <div class="info-row about-row"><span>Über die App</span><p>Für die Klasse F13 der PTS · FMS 20 Wien. Ferien nach den veröffentlichten Wiener Terminen; BPT nach Klassenangabe. Einmal geladen, auch offline verfügbar.</p></div>
         </div>
@@ -139,8 +144,8 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="./data.js?v=3.0.0" defer></script>
-  <script src="./app.js?v=3.0.0" defer></script>
+  <script src="./data.js?v=3.1.0" defer></script>
+  <script src="./app.js?v=3.1.0" defer></script>
 </body>
 </html>
 

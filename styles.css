@@ -515,3 +515,36 @@ body {
   .day-tab { min-height: 57px; }
   .day-tab .day-number { width: 25px; height: 25px; font-size: 12px; }
 }
+
+
+/* Schularbeiten */
+.upcoming-assessment { margin: 0 0 27px; }
+.assessment-card {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 78px; padding: 13px 14px;
+  border: 1px solid #e1d7f6; border-left: 4px solid #8966c5; border-radius: 18px;
+  background: linear-gradient(110deg, #fff, #f8f4ff); color: var(--ink); text-align: left;
+  box-shadow: var(--shadow-card); cursor: pointer; transition: transform .18s var(--ease), box-shadow .18s;
+}
+.assessment-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-float); }
+.assessment-card-icon { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; border-radius: 15px; background: #eee6fc; color: #805bb9; }
+.assessment-card-icon .icon { width: 23px; height: 23px; }
+.assessment-card-copy { flex: 1; min-width: 0; }
+.assessment-card-copy strong, .assessment-card-copy small { display: block; }
+.assessment-card-copy strong { color: var(--ink); font-size: 15px; font-weight: 800; }
+.assessment-card-copy small { margin-top: 4px; color: var(--muted); font-size: 11px; }
+.assessment-countdown { padding: 6px 8px; border-radius: 9px; background: #eee6fc; color: #7653af; font-size: 10px; font-weight: 850; white-space: nowrap; }
+.assessment-arrow { width: 15px; height: 15px; color: var(--muted); }
+.day-summary.has-assessment { margin: 0 0 14px; padding: 10px 12px; border: 1px solid #e1d7f6; border-radius: 12px; background: color-mix(in srgb, #eee6fc 56%, var(--surface)); color: #7653af; font-weight: 750; }
+.calendar-day.has-assessment::before { position: absolute; bottom: 4px; left: calc(50% - 5px); width: 4px; height: 4px; border-radius: 50%; background: #8966c5; content: ""; }
+.calendar-day.has-lessons.has-assessment::after { left: calc(50% + 2px); }
+.calendar-day.selected.has-assessment::before, .calendar-day.selected.has-assessment::after { background: #fff; }
+.legend-assessment { background: #8966c5; }
+.event-assessment .event-icon, .event-assessment .event-tag { background: #eee6fc; color: #7653af; }
+:root[data-theme="dark"] .assessment-card { border-color: #51436f; border-left-color: #ae8be5; background: linear-gradient(110deg, #1c2338, #29213b); }
+:root[data-theme="dark"] .assessment-card-icon, :root[data-theme="dark"] .assessment-countdown,
+:root[data-theme="dark"] .event-assessment .event-icon, :root[data-theme="dark"] .event-assessment .event-tag { background: #39304e; color: #d2b9ff; }
+:root[data-theme="dark"] .day-summary.has-assessment { border-color: #51436f; background: #29213b; color: #d2b9ff; }
+@media (max-width: 420px) {
+  .assessment-card { gap: 9px; padding: 11px; }
+  .assessment-countdown { font-size: 9px; }
+}

@@ -2,7 +2,7 @@
   "id": "./",
   "name": "F13 Stundenplan · PTS FMS 20 Wien",
   "short_name": "F13",
-  "description": "Stundenplan, Ferien und BPT der Klasse F13 der PTS FMS 20 Wien.",
+  "description": "Stundenplan, Ferien, Schularbeiten und BPT der Klasse F13 der PTS FMS 20 Wien.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
