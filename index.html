@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1676c8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Stundenplan">
+  <title>Stundenplan</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <style>
+    :root{
+      --brand:#1676c8;
+      --brand-dark:#0e67b4;
+      --brand-soft:#e8f3fb;
+      --bg:#f4f6f8;
+      --card:#ffffff;
+      --line:#dfe5ea;
+      --text:#1e2933;
+      --muted:#71808d;
+      --lesson:#dff3e7;
+      --lesson-border:#2e9e65;
+      --practice:#fff0dd;
+      --practice-border:#ef8f2e;
+      --danger:#f8dfe1;
+      --danger-border:#d45561;
+      --shadow:0 2px 10px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text)}
+    body{min-height:100vh}
+    button{font:inherit}
+    .app{max-width:760px;margin:0 auto;min-height:100vh;background:var(--bg)}
+    .top{position:sticky;top:0;z-index:30;background:var(--brand);color:#fff;padding:calc(8px + env(safe-area-inset-top)) 12px 0;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+    .topline{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;height:52px}
+    .hamb,.cal{border:0;background:transparent;color:#fff;font-size:24px;border-radius:12px;height:40px;cursor:pointer}
+    .apptitle{text-align:center;font-size:20px;font-weight:700}
+    .weekrow{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:6px;padding:4px 0 10px}
+    .weekrow button{border:0;background:rgba(255,255,255,.12);color:white;border-radius:10px;height:34px;font-size:22px;cursor:pointer}
+    .weektitle{text-align:center;font-weight:600;font-size:14px}
+    .days{background:white;display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--line);position:sticky;top:106px;z-index:25}
+    .day{border:0;background:white;padding:9px 3px 8px;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted)}
+    .day .wd{font-size:11px;font-weight:800;letter-spacing:.3px}.day .dn{font-size:18px;font-weight:800;margin-top:3px;color:var(--text)}
+    .day.active{border-bottom-color:var(--brand)}.day.active .wd,.day.active .dn{color:var(--brand)}
+    .day.today .dn{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;background:var(--brand-soft);border-radius:999px}
+    .content{padding:14px 10px 90px}.datehead{font-size:18px;font-weight:750;margin:2px 4px 12px}
+    .lessonrow{display:grid;grid-template-columns:70px 1fr;gap:9px;margin-bottom:9px}
+    .time{text-align:right;padding-top:10px;color:var(--muted);font-size:12px;line-height:1.25}.time b{font-size:14px;color:#40505d}
+    .card{background:var(--lesson);border:1px solid #cce8d7;border-left:5px solid var(--lesson-border);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow);cursor:pointer;min-height:62px}
+    .card.practice{background:var(--practice);border-color:#f3d3aa;border-left-color:var(--practice-border)}
+    .subject{font-size:16px;font-weight:800}.submeta{font-size:12px;color:var(--muted);margin-top:4px}
+    .empty{background:white;border:1px solid var(--line);border-radius:12px;padding:18px;color:var(--muted)}
+    .fab{position:fixed;right:max(18px,calc((100vw - 760px)/2 + 18px));bottom:82px;width:52px;height:52px;border-radius:50%;border:0;background:var(--brand);color:white;font-size:27px;box-shadow:0 5px 18px rgba(0,0,0,.25);cursor:pointer}
+    .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;z-index:40;width:min(760px,100%);background:white;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+    .bottom button{border:0;background:none;color:var(--muted);font-size:12px;font-weight:700;padding:7px 3px;cursor:pointer}.bottom .ico{font-size:21px;display:block;line-height:1.1;margin-bottom:2px}.bottom .active{color:var(--brand)}
+    dialog{border:0;border-radius:18px;width:min(92vw,470px);padding:0;box-shadow:0 18px 55px rgba(0,0,0,.28)}dialog::backdrop{background:rgba(0,0,0,.35)}
+    .dlghead{background:var(--brand);color:#fff;padding:18px}.dlghead h2{margin:0;font-size:20px}.dlgbody{padding:18px}
+    .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:800;color:var(--muted)}.value{margin:4px 0 16px;font-size:16px}.close{width:100%;border:0;background:var(--brand);color:white;border-radius:11px;padding:13px;font-weight:800}
+    #picker{position:absolute;opacity:0;pointer-events:none}.installbar{display:none;margin:0 10px 10px;background:white;border:1px solid var(--line);border-radius:12px;padding:12px;align-items:center;justify-content:space-between;gap:10px;box-shadow:var(--shadow)}.installbar.show{display:flex}.installbar span{font-size:13px;color:var(--muted)}.installbar button{border:0;background:var(--brand);color:#fff;border-radius:10px;padding:9px 12px;font-weight:700}
+    @media(max-width:420px){.lessonrow{grid-template-columns:63px 1fr}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top"><div class="topline"><button class="hamb" aria-label="Menü">☰</button><div class="apptitle">Stundenplan</div><button class="cal" id="calBtn" aria-label="Kalender">▣</button><input id="picker" type="date" min="2026-09-24" max="2027-07-02"></div><div class="weekrow"><button id="prev">‹</button><div class="weektitle" id="weektitle"></div><button id="next">›</button></div></header>
+  <nav class="days" id="days"></nav>
+  <div class="installbar" id="installbar"><span>Als App auf deinem Handy installieren</span><button id="installBtn">Installieren</button></div>
+  <main class="content"><div class="datehead" id="datehead"></div><section id="schedule"></section></main>
+  <button class="fab" id="todayFab" title="Heute">⌂</button>
+  <nav class="bottom"><button class="active"><span class="ico">▦</span>Stundenplan</button><button id="todayBottom"><span class="ico">●</span>Heute</button><button><span class="ico">☷</span>Mehr</button></nav>
+</div>
+<dialog id="dlg"><div class="dlghead"><h2 id="dSubject"></h2></div><div class="dlgbody"><div class="label">Datum</div><div class="value" id="dDate"></div><div class="label">Zeit</div><div class="value" id="dTime"></div><div class="label">Typ</div><div class="value" id="dType"></div><button class="close" onclick="dlg.close()">Schließen</button></div></dialog>
+<script>
+const START=new Date(2026,8,24), END=new Date(2027,6,2);
+const DAYN=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"],DAYS=["SO","MO","DI","MI","DO","FR","SA"],MONTHS=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const TT={1:[["08:00","08:50","M"],["09:00","09:50","D"],["10:05","10:55","PBW"],["11:05","11:55","E"],["12:05","12:55","IKF"],["14:00","14:50","BUS"],["14:55","15:45","BUS"]],2:[["08:00","17:35","PRAXISTAG","practice"]],3:[["08:00","08:50","D"],["09:00","09:50","M"],["10:05","10:55","BOL"],["11:05","11:55","PBW"],["12:05","12:55","ISB"],["13:00","13:50","BF – D, M, E"]],4:[["08:00","08:50","IKF"],["09:00","09:50","M"],["10:05","10:55","E"],["11:05","11:55","BOL"],["12:05","12:55","D"]],5:[["08:00","08:50","X"],["09:00","09:50","ISB"],["10:05","10:55","E"],["11:05","11:55","DGB"],["12:05","12:55","PBW"]]};
+const copy=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()),same=(a,b)=>a.getFullYear()==b.getFullYear()&&a.getMonth()==b.getMonth()&&a.getDate()==b.getDate(),fmt=d=>`${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`,clamp=d=>d<START?copy(START):d>END?copy(END):copy(d);
+function monday(d){d=copy(d);let n=d.getDay();d.setDate(d.getDate()+(n===0?-6:1-n));return d}function localToday(){let d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+let selected=clamp(localToday());if(selected.getDay()==0)selected.setDate(selected.getDate()+1);if(selected.getDay()==6)selected.setDate(selected.getDate()+2);selected=clamp(selected);
+function choose(d){d=clamp(d);if(d.getDay()==6)d.setDate(d.getDate()+2);if(d.getDay()==0)d.setDate(d.getDate()+1);selected=clamp(d);render()}
+function render(){const m=monday(selected),f=new Date(m);f.setDate(m.getDate()+4);weektitle.textContent=`${fmt(m)} – ${fmt(f)}`;days.innerHTML="";for(let i=0;i<5;i++){const d=new Date(m);d.setDate(m.getDate()+i);const b=document.createElement("button");b.className="day";if(same(d,selected))b.classList.add("active");if(same(d,localToday()))b.classList.add("today");if(d<START||d>END){b.disabled=true;b.style.opacity=".35"}b.innerHTML=`<div class="wd">${DAYS[d.getDay()]}</div><div class="dn">${d.getDate()}</div>`;b.onclick=()=>choose(d);days.appendChild(b)}datehead.textContent=`${DAYN[selected.getDay()]}, ${selected.getDate()}. ${MONTHS[selected.getMonth()]} ${selected.getFullYear()}`;schedule.innerHTML="";const arr=TT[selected.getDay()]||[];if(!arr.length){schedule.innerHTML='<div class="empty">Kein Unterricht eingetragen.</div>';return}arr.forEach(e=>{const[a,b,s,t]=e,row=document.createElement("div");row.className="lessonrow";row.innerHTML=`<div class="time"><b>${a}</b><br>${b}</div><div class="card ${t==="practice"?"practice":""}"><div class="subject">${s}</div><div class="submeta">${t==="practice"?"Praxistag":"Unterricht"}</div></div>`;row.querySelector(".card").onclick=()=>openDlg(s,a,b,t);schedule.appendChild(row)})}
+function openDlg(s,a,b,t){dSubject.textContent=s;dDate.textContent=`${DAYN[selected.getDay()]}, ${fmt(selected)}`;dTime.textContent=`${a} – ${b}`;dType.textContent=t==="practice"?"Praxistag":"Unterricht";dlg.showModal()}
+prev.onclick=()=>{let d=copy(selected);d.setDate(d.getDate()-7);choose(d)};next.onclick=()=>{let d=copy(selected);d.setDate(d.getDate()+7);choose(d)};todayFab.onclick=todayBottom.onclick=()=>choose(localToday());calBtn.onclick=()=>{picker.value=`${selected.getFullYear()}-${String(selected.getMonth()+1).padStart(2,"0")}-${String(selected.getDate()).padStart(2,"0")}`;if(picker.showPicker)picker.showPicker();else picker.click()};picker.onchange=()=>{let[y,m,d]=picker.value.split("-").map(Number);choose(new Date(y,m-1,d))};
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./service-worker.js")}let deferredPrompt=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;installbar.classList.add("show")});installBtn.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installbar.classList.remove("show")};window.addEventListener("appinstalled",()=>installbar.classList.remove("show"));render();
+</script>
+</body>
+</html>
