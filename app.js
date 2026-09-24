@@ -378,7 +378,9 @@
   window.addEventListener("appinstalled", () => { $("#installCard").hidden = true; showToast("Stundenplan wurde installiert."); });
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
-    navigator.serviceWorker.register(new URL("./service-worker.js", document.baseURI)).catch(() => showToast("Offline-Speicherung konnte nicht gestartet werden."));
+    navigator.serviceWorker.register(new URL("./service-worker.js", document.baseURI), { updateViaCache: "none" })
+      .then((registration) => registration.update().catch(() => {}))
+      .catch(() => showToast("Offline-Speicherung konnte nicht gestartet werden."));
   }
 
   render();
